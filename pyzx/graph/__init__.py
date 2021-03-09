@@ -25,5 +25,6 @@ __all__ = [
 ]
 
 from .graph import Graph
+from .graph_sym import GraphSym
 from .scalar import Scalar
 from .base import EdgeType, VertexType, toggle_edge, vertex_is_zx, toggle_vertex

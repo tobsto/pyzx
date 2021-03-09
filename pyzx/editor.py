@@ -128,6 +128,10 @@ def s_to_phase(s: str, t:VertexType.Type=VertexType.Z) -> Fraction:
 		if a == '-': a = '-1'
 		return Fraction(int(a),int(b))
 	if not s: return Fraction(1)
+	if s.lstrip('$').startswith('\\'):
+		return s[3:-1]
+	else:
+		return s[1:-1]
 	return Fraction(int(s))
 
 def graph_to_json(g: GraphS, scale:FloatInt, verts:Optional[List[int]]=None,edges:Optional[List[Tuple[int,int]]]=None) -> str:

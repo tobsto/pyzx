@@ -15,6 +15,7 @@
 # limitations under the License.
 
 import os
+import sympy
 from fractions import Fraction
 from typing import Union, Optional, List, Dict
 from typing_extensions import Literal, Final
@@ -53,10 +54,12 @@ def toggle_edge(ty: EdgeType.Type) -> EdgeType.Type:
 
 
 
-def phase_to_s(a: FractionLike, t:VertexType.Type=VertexType.Z):
+def phase_to_s(a: Union[FractionLike, sympy.Symbol], t:VertexType.Type=VertexType.Z):
     if (a == 0 and t != VertexType.H_BOX): return ''
     if (a == 1 and t == VertexType.H_BOX): return ''
     if not isinstance(a, Fraction):
+        if isinstance(a, sympy.Symbol):
+            return '${}$'.format(sympy.latex(a))
         a = Fraction(a)
 
     if a == 0: return '0'
