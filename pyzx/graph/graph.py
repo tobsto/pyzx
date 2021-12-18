@@ -19,7 +19,12 @@ from typing import Optional
 from .base import BaseGraph
 from .graph_s import GraphS
 
-backends = {'simple': True}
+try:
+	import quizx # type: ignore
+except ImportError:
+	quizx = None
+
+backends = { 'simple': True, 'quizx-vec': False if quizx is None else True }
 
 def Graph(backend:Optional[str]=None) -> BaseGraph:
 	"""Returns an instance of an implementation of :class:`~pyzx.graph.base.BaseGraph`. 
@@ -41,6 +46,7 @@ def Graph(backend:Optional[str]=None) -> BaseGraph:
 	if backend == 'graph_tool': 
 		return GraphGT()
 	if backend == 'igraph': return GraphIG()
+	if backend == 'quizx-vec': return quizx.VecGraph() # type: ignore
 	return GraphS()
 
 Graph.from_json = GraphS.from_json # type: ignore
