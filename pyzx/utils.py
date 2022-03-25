@@ -1,4 +1,4 @@
-# PyZX - Python library for quantum circuit rewriting 
+# PyZX - Python library for quantum circuit rewriting
 #        and optimization using the ZX-calculus
 # Copyright (C) 2018 - Aleks Kissinger and John van de Wetering
 
@@ -74,6 +74,12 @@ def phase_to_s(a: Union[FractionLike, sympy.Symbol], t:VertexType.Type=VertexTyp
     # unicode 0x03c0 = pi
     return simstr + ns + '\u03c0' + ds
 
+def phase_is_clifford(phase: FractionLike):
+    return phase in [Fraction(i, 2) for i in range(4)]
+
+def phase_is_pauli(phase: FractionLike):
+    return phase in (0, 1)
+
 tikz_classes = {
     'boundary': 'none',
     'Z': 'Z dot',
@@ -87,7 +93,7 @@ tikz_classes = {
 
 class Settings(object): # namespace class
     mode: Literal["notebook", "browser", "shell"] = "shell"
-    drawing_backend: Literal["d3","matplotlib"] = "d3" 
+    drawing_backend: Literal["d3","matplotlib"] = "d3"
     drawing_auto_hbox: bool = False
     javascript_location: str = "" # Path to javascript files of pyzx
     d3_load_string: str = ""
