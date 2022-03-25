@@ -254,6 +254,16 @@ def draw_matplotlib(
 # make sure we get a fresh random seed
 random_graphid = random.Random()
 
+# def init_drawing() -> None:
+#     if settings.mode not in ("notebook", "browser"): return
+#
+#     library_code = '<script type="text/javascript">\n'
+#     for lib in ['d3.v5.min.inline.js']:
+#         with open(os.path.join(settings.javascript_location, lib), 'r') as f:
+#             library_code += f.read() + '\n'
+#     library_code += '</script>'
+#     display(HTML(library_code))
+
 def draw_d3(
     g: Union[BaseGraph[VT,ET], Circuit],
     labels:bool=False, 
@@ -306,24 +316,25 @@ def draw_d3(
               'target': str(g.edge_t(e)),
               't': g.edge_type(e) } for e in g.edges()]
     graphj = json.dumps({'nodes': nodes, 'links': links})
-    with open(os.path.join(settings.javascript_location, 'zx_viewer.js'), 'r') as f:
-        viewer_code = f.read()
+
+    with open(os.path.join(settings.javascript_location, 'zx_viewer.inline.js'), 'r') as f:
+        library_code = f.read() + '\n'
+
     text = """<div style="overflow:auto" id="graph-output-{id}"></div>
-<script type="text/javascript">
-{d3_load}
-{viewer_code}
-</script>
-<script type="text/javascript">
-require(['zx_viewer'], function(zx_viewer) {{
-    zx_viewer.showGraph('#graph-output-{id}',
-    JSON.parse('{graph}'), {width}, {height}, {scale}, {node_size}, {hbox}, {labels}, '{scalar_str}');
-}});
-</script>""".format(id = graph_id, d3_load = settings.d3_load_string, viewer_code=viewer_code, 
+<script type="module">
+var d3;
+if (d3 == null) {{ d3 = await import("https://cdn.skypack.dev/d3@5"); }}
+{library_code}
+showGraph('#graph-output-{id}',
+  JSON.parse('{graph}'), {width}, {height}, {scale},
+  {node_size}, {hbox}, {labels}, '{scalar_str}');
+</script>""".format(library_code=library_code,
+                    id = graph_id,
                     graph = graphj, 
-                   width=w, height=h, scale=scale, node_size=node_size,
-                   hbox = 'true' if auto_hbox else 'false',
-                   labels='true' if labels else 'false',
-                   scalar_str=g.scalar.to_unicode() if show_scalar else '')
+                    width=w, height=h, scale=scale, node_size=node_size,
+                    hbox = 'true' if auto_hbox else 'false',
+                    labels='true' if labels else 'false',
+                    scalar_str=g.scalar.to_unicode() if show_scalar else '')
     if settings.mode == "notebook":
         display(HTML(text))
     else:
